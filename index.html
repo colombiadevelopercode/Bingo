@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Bingo Bosa Estación</title>
+
+
 
 <style>
     body {
@@ -21,9 +25,13 @@
         z-index: 9999;
     }
 
+    /* ==========================
+       LAYOUT BASE
+    ========================== */
     .container {
         display: flex;
         height: 100vh;
+        width: 100%;
     }
 
     .left {
@@ -38,26 +46,35 @@
         overflow: hidden;
     }
 
-    /* 🟡 NUEVO: Flotantes por encima + izquierda */
-    .floating-top {
+    .right {
+        width: 50%;
+        padding: 30px;
+        overflow-y: auto;
+    }
+
+    /* ==========================
+       FLOTANTES
+    ========================== */
+
+    .floating-top,
+    .floating-bottom {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 120%;
-        height: 45%; /* por encima y a la izquierda */
         pointer-events: none;
         z-index: 0;
     }
 
-    /* 🟡 NUEVO: Flotantes en parte inferior izquierda */
-    .floating-bottom {
-        position: absolute;
-        top: 55%; /* debajo de la bola */
+    .floating-top {
+        width: 120%;
+        height: 45%;
+        top: 0;
         left: 0;
+    }
+
+    .floating-bottom {
         width: 150%;
-        height: 45%; /* parte baja */
-        pointer-events: none;
-        z-index: 0;
+        height: 45%;
+        top: 55%;
+        left: 0;
     }
 
     .float-ball {
@@ -77,9 +94,9 @@
         100% { transform: translateY(0px); }
     }
 
-    /* =====================
-       TU MISMO CÓDIGO
-    ====================== */
+    /* ==========================
+       BALOTA
+    ========================== */
 
     #bola {
         width: 260px;
@@ -113,20 +130,21 @@
         100% { transform: translateX(0); }
     }
 
+    /* ==========================
+       ORBITA 3D ORIGINAL
+    ========================== */
+
     #orbita {
-    position: absolute;
-    width: 1300px;
-    height: 1300px;
-    top: 42%;
-    left: 50%;
-    transform-style: preserve-3d;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 10;
-}
-
-
-    
+        position: absolute;
+        width: 1300px;       /* tamaño grande para escritorio */
+        height: 1300px;
+        top: 42%;
+        left: 50%;
+        transform-style: preserve-3d;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 10;
+    }
 
     .punto {
         position: absolute;
@@ -147,11 +165,31 @@
         100% { transform: translate(-50%, -50%) rotateY(360deg); }
     }
 
-    .right {
-        width: 50%;
-        padding: 30px;
-        overflow-y: auto;
+    /* ==========================
+       BOTÓN
+    ========================== */
+
+    #btn {
+        margin-top: 30px;
+        padding: 18px 50px;
+        font-size: 22px;
+        background: #00389F;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        color: white;
+        box-shadow: 0 0 15px #00389F;
+        z-index: 100;
     }
+
+    #btn:active {
+        transform: scale(1.15);
+        transition: transform 0.15s ease;
+    }
+
+    /* ==========================
+       TABLERO DERECHA
+    ========================== */
 
     .fila {
         display: flex;
@@ -180,28 +218,85 @@
         animation: pop 0.4s ease;
     }
 
-    @keyframes pop {
-        0% { transform: scale(0.5); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
+    /* ==============================
+       🎯 RESPONSIVE — ESCALADO REAL
+    ============================== */
+
+    @media (max-width: 900px) {
+
+        .container {
+            flex-direction: column;
+            height: auto;
+            overflow: hidden;
+        }
+
+        .left {
+            width: 100%;
+            height: 60vh;
+            border-right: none;
+            border-bottom: 3px solid #FFD700;
+            padding-top: 110px;
+        }
+
+        .right {
+            width: 100%;
+            height: auto;
+        }
+
+        /* 🟡 ESCALA COMPLETA DE LA ÓRBITA */
+        #orbita {
+            transform: translate(-50%, -50%) scale(0.45) !important;
+            top: 45% !important;
+        }
+
+        #bola {
+            width: 150px;
+            height: 150px;
+            font-size: 32px;
+            margin-bottom: 20px;
+            z-index: 20;
+        }
+
+        #btn {
+            padding: 12px 35px;
+            font-size: 18px;
+            margin-top: 10px;
+            z-index: 20;
+        }
+
+        .letra {
+            font-size: 40px;
+            width: 45px;
+        }
     }
 
-    #btn {
-        margin-top: 30px;
-        padding: 18px 50px;
-        font-size: 22px;
-        background: #00389F;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        color: white;
-        box-shadow: 0 0 15px #00389F;
-        z-index: 100;
+    @media (max-width: 450px) {
+
+        #orbita {
+        position: absolute;
+        width: 1800px;       /* tamaño grande para escritorio */
+        height: 1800px;
+        top: 8%;
+        left: 50%;
+        transform-style: preserve-3d;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 10;
     }
 
-    #btn:active {
-    transform: scale(1.15);
-    transition: transform 0.15s ease;
-}
+
+        #bola {
+            width: 150px;
+            height: 150px;
+            bottom: 14%;
+            font-size: 26px;
+        }
+
+        #btn {
+            padding: 10px 28px;
+            font-size: 16px;
+        }
+    }
 
 </style>
 </head>
@@ -214,7 +309,6 @@
 <div class="container">
     <div class="left">
 
-        <!-- 🟡 NUEVO: dos zonas de bolas flotantes -->
         <div class="floating-top" id="floatingTop"></div>
         <div class="floating-bottom" id="floatingBottom"></div>
 
@@ -234,6 +328,7 @@
     </div>
 </div>
 
+
 <!-- SONIDOS -->
 <audio id="s_ruleta" src="https://cdn.freesound.org/previews/560/560145_7037-lq.mp3"></audio>
 <audio id="s_pop" src="https://cdn.freesound.org/previews/341/341695_5260870-lq.mp3"></audio>
@@ -241,7 +336,7 @@
 
 <script>
 /* ============================================================
-   🟡 GENERAR BOLAS FLOTANTES SIN CUBRIR LA BALOTA
+   BOLAS FLOTANTES
 ============================================================ */
 
 function generarBolas(area, cantidad) {
@@ -263,7 +358,7 @@ generarBolas(document.getElementById("floatingTop"), 60);
 generarBolas(document.getElementById("floatingBottom"), 60);
 
 /* ============================================================
-   TU MISMA LÓGICA DE ÓRBITA Y BINGO
+   ÓRBITA 3D
 ============================================================ */
 
 const orbita = document.getElementById("orbita");
@@ -273,8 +368,8 @@ const anillos = 20;
 const puntosPorAnillo = 30;
 
 for (let a = 0; a < anillos; a++) {
-const lat = (a / (anillos - 1)) * Math.PI - Math.PI / 2;
-const altura = Math.sin(lat) * 200;  // usa el MISMO radio que en x/z
+    const lat = (a / (anillos - 1)) * Math.PI - Math.PI / 2;
+    const altura = Math.sin(lat) * 200;
 
     for (let i = 0; i < puntosPorAnillo; i++) {
 
@@ -283,8 +378,8 @@ const altura = Math.sin(lat) * 200;  // usa el MISMO radio que en x/z
 
         const ang = (i / puntosPorAnillo) * Math.PI * 2;
 
-        const lat = (a / (anillos - 1)) * Math.PI - Math.PI / 2;
-        const radio = Math.cos(lat) * 200;
+        const lat2 = (a / (anillos - 1)) * Math.PI - Math.PI / 2;
+        const radio = Math.cos(lat2) * 200;
 
         const x = Math.cos(ang) * radio;
         const z = Math.sin(ang) * radio;
@@ -310,6 +405,10 @@ function actualizarVisibilidad() {
         p.style.opacity = factor > 0 ? 1 : 0.15;
     });
 }
+
+/* ============================================================
+   LÓGICA BINGO
+============================================================ */
 
 let balotas = Array.from({ length: 75 }, (_, i) => i + 1);
 let intervalo = null;
