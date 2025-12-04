@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Bingo Profesional — Orbita 3D</title>
+
+<style>
+    body {
+        margin: 0;
+        background: #200654;
+        color: white;
+        font-family: Arial, sans-serif;
+        overflow-x: hidden;
+    }
+
+    #logoMira {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        width: 150px;
+        z-index: 9999;
+    }
+
+    .container {
+        display: flex;
+        height: 100vh;
+    }
+
+    .left {
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        position: relative;
+        perspective: 2000px;
+        border-right: 3px solid #FFD700;
+        overflow: hidden;
+    }
+
+    /* 🟡 NUEVO: Flotantes por encima + izquierda */
+    .floating-top {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 120%;
+        height: 45%; /* por encima y a la izquierda */
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* 🟡 NUEVO: Flotantes en parte inferior izquierda */
+    .floating-bottom {
+        position: absolute;
+        top: 55%; /* debajo de la bola */
+        left: 0;
+        width: 150%;
+        height: 45%; /* parte baja */
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .float-ball {
+        position: absolute;
+        width: 42px;
+        height: 42px;
+        background: radial-gradient(circle, #FFF6B0, #ffe57b);
+        border-radius: 50%;
+        opacity: 0.70;
+        animation: float 6s ease-in-out infinite;
+        filter: blur(1px);
+    }
+
+    @keyframes float {
+        0%   { transform: translateY(0px); }
+        50%  { transform: translateY(-35px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* =====================
+       TU MISMO CÓDIGO
+    ====================== */
+
+    #bola {
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #FFF3D6, #FFD700);
+        border: 8px solid #FFD700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+        font-weight: bold;
+        color: #000;
+        position: relative;
+        z-index: 5;
+        transition: 0.3s;
+    }
+
+    .flash { animation: flash 0.6s ease; }
+    @keyframes flash {
+        0% { box-shadow: 0 0 40px 15px #FFD700; }
+        100% { box-shadow: none; }
+    }
+
+    .shake { animation: shake 0.4s ease; }
+    @keyframes shake {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        50% { transform: translateX(10px); }
+        75% { transform: translateX(-6px); }
+        100% { transform: translateX(0); }
+    }
+
+    #orbita {
+    position: absolute;
+    width: 1300px;
+    height: 1300px;
+    top: 42%;
+    left: 50%;
+    transform-style: preserve-3d;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+
+    
+
+    .punto {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: #FFD700;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.1s linear;
+    }
+
+    .girar {
+        animation: rotar 0.6s linear infinite;
+    }
+
+    @keyframes rotar {
+        0%   { transform: translate(-50%, -50%) rotateY(0deg); }
+        100% { transform: translate(-50%, -50%) rotateY(360deg); }
+    }
+
+    .right {
+        width: 50%;
+        padding: 30px;
+        overflow-y: auto;
+    }
+
+    .fila {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #444;
+    }
+
+    .letra {
+        width: 70px;
+        font-size: 55px;
+        font-weight: bold;
+        color: #FFD700;
+        text-shadow: 0 0 10px #FFD700;
+    }
+
+    .numero {
+        display: inline-block;
+        margin: 5px;
+        padding: 8px 14px;
+        background: #222;
+        border: 2px solid #FFD700;
+        border-radius: 5px;
+        font-size: 22px;
+        animation: pop 0.4s ease;
+    }
+
+    @keyframes pop {
+        0% { transform: scale(0.5); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    #btn {
+        margin-top: 30px;
+        padding: 18px 50px;
+        font-size: 22px;
+        background: #00389F;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        color: white;
+        box-shadow: 0 0 15px #00389F;
+        z-index: 100;
+    }
+
+    #btn:active {
+    transform: scale(1.15);
+    transition: transform 0.15s ease;
+}
+
+</style>
+</head>
+
+<body>
+
+<img id="logoMira"
+    src="https://partidomira.com/wp-content/uploads/2024/10/logo_sidebar.png.webp" />
+
+<div class="container">
+    <div class="left">
+
+        <!-- 🟡 NUEVO: dos zonas de bolas flotantes -->
+        <div class="floating-top" id="floatingTop"></div>
+        <div class="floating-bottom" id="floatingBottom"></div>
+
+        <div id="orbita"></div>
+
+        <div id="bola">¡ MIRA !</div>
+
+        <button id="btn">Sacar Balota</button>
+    </div>
+
+    <div class="right">
+        <div class="fila"><div class="letra">B</div><div id="historialB"></div></div>
+        <div class="fila"><div class="letra">I</div><div id="historialI"></div></div>
+        <div class="fila"><div class="letra">N</div><div id="historialN"></div></div>
+        <div class="fila"><div class="letra">G</div><div id="historialG"></div></div>
+        <div class="fila"><div class="letra">O</div><div id="historialO"></div></div>
+    </div>
+</div>
+
+<!-- SONIDOS -->
+<audio id="s_ruleta" src="https://cdn.freesound.org/previews/560/560145_7037-lq.mp3"></audio>
+<audio id="s_pop" src="https://cdn.freesound.org/previews/341/341695_5260870-lq.mp3"></audio>
+<audio id="s_hit" src="https://cdn.freesound.org/previews/411/411642_5121236-lq.mp3"></audio>
+
+<script>
+/* ============================================================
+   🟡 GENERAR BOLAS FLOTANTES SIN CUBRIR LA BALOTA
+============================================================ */
+
+function generarBolas(area, cantidad) {
+    for (let i = 0; i < cantidad; i++) {
+        const ball = document.createElement("div");
+        ball.classList.add("float-ball");
+
+        ball.style.left = (Math.random() * 80) + "%";
+        ball.style.top = (Math.random() * 80) + "%";
+
+        ball.style.animationDuration = (5 + Math.random() * 4) + "s";
+        ball.style.animationDelay = Math.random() * 3 + "s";
+
+        area.appendChild(ball);
+    }
+}
+
+generarBolas(document.getElementById("floatingTop"), 60);
+generarBolas(document.getElementById("floatingBottom"), 60);
+
+/* ============================================================
+   TU MISMA LÓGICA DE ÓRBITA Y BINGO
+============================================================ */
+
+const orbita = document.getElementById("orbita");
+let puntos = [];
+
+const anillos = 20;
+const puntosPorAnillo = 30;
+
+for (let a = 0; a < anillos; a++) {
+const lat = (a / (anillos - 1)) * Math.PI - Math.PI / 2;
+const altura = Math.sin(lat) * 200;  // usa el MISMO radio que en x/z
+
+    for (let i = 0; i < puntosPorAnillo; i++) {
+
+        const p = document.createElement("div");
+        p.classList.add("punto");
+
+        const ang = (i / puntosPorAnillo) * Math.PI * 2;
+
+        const lat = (a / (anillos - 1)) * Math.PI - Math.PI / 2;
+        const radio = Math.cos(lat) * 200;
+
+        const x = Math.cos(ang) * radio;
+        const z = Math.sin(ang) * radio;
+
+        p.dataset.z = z;
+
+        p.style.top = "50%";
+        p.style.left = "50%";
+        p.style.transform = `translate(${x}px, ${altura}px) translateZ(${z}px)`;
+
+        orbita.appendChild(p);
+        puntos.push(p);
+    }
+}
+
+let angulo = 0;
+
+function actualizarVisibilidad() {
+    const rad = (angulo % 360) * Math.PI / 180;
+    puntos.forEach(p => {
+        const z = parseFloat(p.dataset.z);
+        const factor = Math.cos(rad) * z;
+        p.style.opacity = factor > 0 ? 1 : 0.15;
+    });
+}
+
+let balotas = Array.from({ length: 75 }, (_, i) => i + 1);
+let intervalo = null;
+
+const bola = document.getElementById("bola");
+
+function obtenerLetra(n){
+    if(n<=15) return "B";
+    if(n<=30) return "I";
+    if(n<=45) return "N";
+    if(n<=60) return "G";
+    return "O";
+}
+
+document.getElementById("btn").addEventListener("click", () => {
+
+    if (balotas.length === 0) {
+        bola.innerHTML = "FIN";
+        return;
+    }
+
+    bola.innerHTML = "";
+    puntos.forEach(p => p.style.opacity = 1);
+
+    orbita.classList.add("girar");
+
+    s_ruleta.currentTime = 0;
+    s_ruleta.play();
+
+    intervalo = setInterval(() => {
+        angulo += 6;
+        actualizarVisibilidad();
+    }, 20);
+
+    setTimeout(() => {
+
+        clearInterval(intervalo);
+        orbita.classList.remove("girar");
+
+        puntos.forEach(p => p.style.opacity = 0);
+
+        s_ruleta.pause();
+
+        const index = Math.floor(Math.random()*balotas.length);
+        const numero = balotas[index];
+        const letra = obtenerLetra(numero);
+
+        balotas.splice(index, 1);
+
+        bola.classList.add("flash");
+        bola.classList.add("shake");
+
+        s_hit.play();
+
+        bola.innerHTML = `${letra} ${numero}`;
+
+        const span = document.createElement("span");
+        span.className = "numero";
+        span.textContent = numero;
+        document.getElementById("historial"+letra).appendChild(span);
+
+        s_pop.play();
+
+    }, 3000);
+});
+</script>
+
+</body>
+</html>
